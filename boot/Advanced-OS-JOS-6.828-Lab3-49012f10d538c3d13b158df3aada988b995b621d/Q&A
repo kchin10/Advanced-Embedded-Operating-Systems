@@ -1,0 +1,30 @@
+This file answers questions asked after the exercises
+
+Exercise 3
+Q1. At what point does the processor start executing 32-bit code? What exactly causes the switch from 16- to 32-bit mode?
+Ans. Line 55 in boot/boot.S
+
+Q2. What is the last instruction of the boot loader executed, and what is the first instruction of the kernel it just loaded?
+Ans. bootloader last instruction -> line 412 obj/boot/boot.asm OR line 60 boot/main.c
+     kernel first instruction -> line 44 kern/entry.S
+
+Q3. Where is the first instruction of the kernel?
+Ans. 0x0010000c
+
+Q4. How does the boot loader decide how many sectors it must read in order to fetch the entire kernel from disk? Where does it find this information?
+Ans. The program is return to read program headers with help of elf header pointed by ELFHEADER. These program headers inturn point to the loadable code.
+
+Exercise 6
+Q. Why are they different? What is there at the second breakpoint?
+Ans. They are different since memory mapping is not yet enabled. When the second breakpoint arrives 0xf0100000 is inturn remapped to 0x00100000 making them same.
+
+Exercise 7
+Q1. What is the first instruction after the new mapping is established that would fail to work properly if the mapping weren't in place?
+Ans. "jmp %eax" would fail since eax points to non-existent location.
+
+Exercise 9
+Q. Determine where the kernel initializes its stack, and exactly where in memory its stack is located.
+Ans. kernel initializes stack in kern/entry.S from line 74 through line 77, the stack is present at 0xf0110000, since bootstacktop = 0xf0110000
+
+Q. How does the kernel reserve space for its stack?
+Ans. The idea is simple, in JOS code an empty label bootstacktop is created under boot/entry.S, thus forcing the linker to allocate memory for this variable.

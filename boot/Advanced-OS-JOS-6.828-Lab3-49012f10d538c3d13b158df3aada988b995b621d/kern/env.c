@@ -285,7 +285,7 @@ region_alloc(struct Env *e, void *va, size_t len)
 		if (!pp) {
 			panic("Region Alloc -> Out of memory\n");
 		}
-		page_insert(e->env_pgdir, pp, start, PTE_W | PTE_U);
+		page_insert(e->env_pgdir,pp,start,PTE_W | PTE_U);
 	}
 }
 
@@ -344,24 +344,16 @@ load_icode(struct Env *e, uint8_t *binary)
 
 	// LAB 3: Your code here.
 	struct Elf *elfhdr = (struct Elf *)binary;
-
 	struct Proghdr *ph = (struct Proghdr *)((uint8_t *)elfhdr + elfhdr->e_phoff);
-
-	if (elfhdr->e_magic != ELF_MAGIC) 
-	{
+	if (elfhdr->e_magic != ELF_MAGIC) {
 		panic("load_icode -> invalid elf\n");
 	}
 //	struct Proghdr *eph = (struct Proghdr *)((uint8_t *)ph + elfhdr->e_phnum);
 	lcr3(PADDR(e->env_pgdir));
-
 	int i = 0;
-
-	for(i = 0; i < elfhdr->e_phnum;i++) 
-	{
-		if (ph[i].p_type == ELF_PROG_LOAD) 
-		{
-			if (ph[i].p_memsz - ph[i].p_filesz < 0)
-			{
+	for(i = 0; i < elfhdr->e_phnum;i++) {
+		if (ph[i].p_type == ELF_PROG_LOAD) {
+			if (ph[i].p_memsz - ph[i].p_filesz < 0){
 				panic("load_icode: badly ");
 			}
 			region_alloc(e, (void *) ph[i].p_va, ph[i].p_memsz);
@@ -522,8 +514,7 @@ env_run(struct Env *e)
 	//	e->env_tf to sensible values.
 
 	// LAB 3: Your code here.
-	if (curenv != NULL && curenv->env_status == ENV_RUNNING) 
-	{
+	if (curenv != NULL && curenv->env_status == ENV_RUNNING) {
 		curenv->env_status = ENV_RUNNABLE;
 	}
 	e->env_status = ENV_RUNNING;

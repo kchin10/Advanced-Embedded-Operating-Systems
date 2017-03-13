@@ -4,6 +4,7 @@
 #include <inc/memlayout.h>
 #include <inc/trap.h>
 
+#include <kern/picirq.h>
 
 
 ###################################################################
@@ -46,25 +47,54 @@
 /*
  * Lab 3: Your code here for generating entry points for the different traps.
  */
- TRAPHANDLER_NOEC(divide_error, 0)       //Divide error
- TRAPHANDLER_NOEC(debug_execption, 1)       //Debug exceptions
- TRAPHANDLER_NOEC(breakpoint, 3)       //Breakpoint
- TRAPHANDLER_NOEC(overflow, 4)       //Overflow
- TRAPHANDLER_NOEC(bounds_check, 5)       //Bounds check
- TRAPHANDLER_NOEC(invalid_opcode, 6)       //Invalid Opcode
- TRAPHANDLER_NOEC(copro_not_avail, 7)       //Coprocessor not available
- TRAPHANDLER(sys_err, 8)            //System error
- TRAPHANDLER_NOEC(copro_seg_overrun, 9)       //Coprocessor Segment Overrun
- TRAPHANDLER(invalid_tss, 10)          //Invalid TSS
- TRAPHANDLER(seg_not_present, 11)          //Segment not present
- TRAPHANDLER(stack_exception, 12)          //Stack exception
- TRAPHANDLER(general_prot_fault, 13)          //General protection fault
- TRAPHANDLER(page_fault, 14)          //Page fault
- TRAPHANDLER_NOEC(copro_err, 16)     //Coprocessor error
+ TRAPHANDLER_NOEC(divide_error, T_DIVIDE)           //Divide error
+ TRAPHANDLER_NOEC(debug_exception, T_DEBUG)         //Debug exceptions
+ TRAPHANDLER_NOEC(nmi_exception, T_NMI)             //Non maskable interrupt
+ TRAPHANDLER_NOEC(breakpoint_exception, T_BRKPT)    //Breakpoint
+ TRAPHANDLER_NOEC(overflow_exception, T_OFLOW)      //Overflow
+ TRAPHANDLER_NOEC(bounds_check, T_BOUND)            //Bounds check
+ TRAPHANDLER_NOEC(invalid_opcode, T_ILLOP)          //Invalid Opcode
+ TRAPHANDLER_NOEC(copro_not_avail, T_DEVICE)        //Coprocessor not available
+ TRAPHANDLER(sys_err, T_DBLFLT)                     //System error
+ //TRAPHANDLER_NOEC(copro_seg_overrun, T_COPROC)    //Coprocessor Segment Overrun
+ TRAPHANDLER(invalid_tss, T_TSS)                    //Invalid TSS
+ TRAPHANDLER(seg_not_present, T_SEGNP)              //Segment not present
+ TRAPHANDLER(stack_exception, T_STACK)              //Stack exception
+ TRAPHANDLER(general_prot_fault, T_GPFLT)           //General protection fault
+ TRAPHANDLER(page_fault, T_PGFLT)                   //Page fault
+ TRAPHANDLER_NOEC(copro_err, T_FPERR)               //Coprocessor error
+ TRAPHANDLER(align_err, T_ALIGN)                    //Alignment error
+ TRAPHANDLER_NOEC(mchk_err, T_MCHK)                 //Machine check error
+ TRAPHANDLER_NOEC(simd_err, T_SIMDERR)              //SIMD floating point err
+ TRAPHANDLER_NOEC(sys_call,T_SYSCALL)               //System Call
 
+
+.data;
+.globl funcs;
+funcs:
+    .long divide_error;
+    .long debug_exception;
+    .long nmi_exception;
+    .long breakpoint_exception;
+    .long overflow_exception;
+    .long bounds_check;
+    .long invalid_opcode;
+    .long copro_not_avail;
+    .long sys_err;
+    .long invalid_tss;
+    .long seg_not_present;
+    .long stack_exception;
+    .long general_prot_fault;
+    .long page_fault;
+    .long copro_err;
+    .long align_err;
+    .long mchk_err;
+    .long simd_err;
+    .long sys_call;
 /*
  * Lab 3: Your code here for _alltraps
  */
+ .text;
 _alltraps:
     pushl %ds
     pushl %es

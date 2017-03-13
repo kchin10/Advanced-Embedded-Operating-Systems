@@ -18,4 +18,6 @@ int mon_backtrace(int argc, char **argv, struct Trapframe *tf);
 int showmappings(int argc, char *argv[],struct Trapframe *tf);
 int stmp(int argc,char *argv[],struct Trapframe *tf);
 int dumpmem(int argc,char *argv[],struct Trapframe *tf);
+int singlestep(int argc,char *argv[],struct Trapframe *tf);
+int continueexec(int argc,char *argv[],struct Trapframe *tf);
 #endif	// !JOS_KERN_MONITOR_H

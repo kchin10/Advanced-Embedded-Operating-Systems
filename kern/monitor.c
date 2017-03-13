@@ -10,8 +10,8 @@
 #include <kern/console.h>
 #include <kern/monitor.h>
 #include <kern/kdebug.h>
-#include <kern/trap.h>
 #include <kern/pmap.h>
+#include <kern/trap.h>
 
 #define CMDBUF_SIZE	80	// enough for one VGA text line
 
@@ -29,7 +29,9 @@ static struct Command commands[] = {
 	{ "backtrace", "Display the backtrace till boot", mon_backtrace},
 	{ "showmappings", "Display page mappings", showmappings},
 	{ "stmp", "set Page Permissions", stmp},
-	{ "dumpmem", "Dump memory", dumpmem}
+	{ "dumpmem", "Dump memory", dumpmem},
+	{"si","single step through the code",singlestep},
+	{"cexec","contine execution",continueexec}
 };
 
 /***** Implementations of basic kernel monitor commands *****/
@@ -79,19 +81,6 @@ int mon_backtrace(int argc, char **argv, struct Trapframe *tf) {
 	}
 	return 0;
 }
-
-/*int
-mon_backtrace(int argc, char **argv, struct Trapframe *tf)
-{
-	uint32_t *ebp = (uint32_t *)read_ebp();
-	cprintf("Stack backtrace:\n");
-	while(ebp) {
-		cprintf("ebp %08x eip %08x args %08x %08x %08x %08x %08x\n",ebp,*(ebp +1),*(ebp+2),\
-				*(ebp+3),*(ebp+4),*(ebp+5));
-		ebp = (uint32_t *)(ebp[0]);
-	}
-	return 0;
-}*/
 
 uint32_t xtoi(char* buf) {
     uint32_t res = 0;
@@ -158,7 +147,7 @@ int stmp(int argc,char *argv[],struct Trapframe *tf) {
 			*pte = *pte & ~perm;
 		}
 	} else {
-		*pte = 0;
+		*pte = *pte & 0xFFFFF000;
 	}
 	cprintf("%x new permissions: ",addr);
 	cprintf("PTE_P: %d, PTE_W: %d, PTE_U: %d\n", *pte&PTE_P, *pte&PTE_W, *pte&PTE_U);
@@ -182,6 +171,16 @@ int dumpmem(int argc,char *argv[],struct Trapframe *tf) {
 		}
 	}
 	return 0;
+}
+
+int singlestep(int argc,char *argv[],struct Trapframe *tf) {
+	tf->tf_eflags = tf->tf_eflags | FL_TF;
+	return -1;
+}
+
+int continueexec(int argc,char *argv[],struct Trapframe *tf) {
+	tf->tf_eflags = tf->tf_eflags & ~FL_TF;
+	return -1;
 }
 
 /***** Kernel monitor command interpreter *****/
